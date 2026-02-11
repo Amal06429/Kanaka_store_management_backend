@@ -13,16 +13,16 @@ from api.models import User
 def create_users():
     """Create initial admin and demo users"""
     # Create admin user
-    if not User.objects.filter(username='admin').exists():
+    if not User.objects.filter(username='fayis@kanaka.com').exists():
         admin = User.objects.create_user(
-            username='admin',
-            password='admin123',
-            email='admin@example.com',
+            username='fayis@kanaka.com',
+            password='admin@fayiskanaka',
+            email='fayis@kanaka.com',
             role='admin',
             is_staff=True,
             is_superuser=True
         )
-        admin.plain_password = 'admin123'  # Store for admin viewing
+        admin.plain_password = 'admin@fayiskanaka'  # Store for admin viewing
         admin.save()
         print(f"✓ Created admin user: {admin.username}")
     else:
@@ -46,7 +46,7 @@ def create_users():
         print("✗ Demo user already exists")
     
     print("\nUsers created successfully!")
-    print("Admin login: admin / admin123")
+    print("Admin login: fayis@kanaka.com / admin@fayiskanaka")
     print("Demo user login: demo / demo123")
 
 if __name__ == '__main__':

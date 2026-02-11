@@ -14,8 +14,8 @@ def update_passwords():
     """Update plain_password field for existing users"""
     # Update admin user
     try:
-        admin = User.objects.get(username='admin')
-        admin.plain_password = 'admin123'
+        admin = User.objects.get(username='fayis@kanaka.com')
+        admin.plain_password = 'admin@fayiskanaka'
         admin.save()
         print(f"✓ Updated admin user password field")
     except User.DoesNotExist:
