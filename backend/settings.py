@@ -131,13 +131,14 @@ MEDIA_URL = "https://pub-cc8a9cb35a1c4e9d9cfe3e3932f9e4da.r2.dev/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'store_management',
-        'USER': 'store_management',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
+
 
 # Custom User Model
 AUTH_USER_MODEL = 'api.User'
