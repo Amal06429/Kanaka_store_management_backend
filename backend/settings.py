@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-237tx3co=3jy30dw@0m-y&cmp*4b6k1&t8r1wkp0lnh$mv&l)m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.kanaka.imcbs.com','kanaka.imcbs.com']
+ALLOWED_HOSTS = [
+    'kanaka.imcbs.com',
+    '.kanaka.imcbs.com',
+    '127.0.0.1',
+    'localhost',
+]
 
 import os
 from dotenv import load_dotenv

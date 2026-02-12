@@ -8,7 +8,7 @@ print("=" * 60)
 # Login
 print("\n1. Logging in as admin...")
 login_response = requests.post(
-    'http://127.0.0.1:8000/api/auth/login/',
+    'https://kanaka.imcbs.com/api/auth/login/',
     json={'username': 'admin', 'password': 'admin123'}
 )
 print(f"Login Status: {login_response.status_code}")
@@ -22,7 +22,7 @@ if login_response.status_code == 200:
     print("\n2. Getting all files...")
     headers = {'Authorization': f'Bearer {token}'}
     files_response = requests.get(
-        'http://127.0.0.1:8000/api/files/',
+        'https://kanaka.imcbs.com/api/files/',
         headers=headers
     )
     print(f"Files Status: {files_response.status_code}")
