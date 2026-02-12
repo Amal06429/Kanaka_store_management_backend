@@ -1,6 +1,23 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils import timezone
+
+
+class CustomUserManager(UserManager):
+    """Custom user manager to handle superuser creation"""
+    
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        """Create and save a superuser with role='admin'"""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'admin')  # Set role to admin for superusers
+        
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        
+        return super().create_superuser(username, email, password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -17,11 +34,19 @@ class User(AbstractUser):
     email = models.EmailField(blank=True, null=True)
     plain_password = models.CharField(max_length=255, blank=True, null=True)  # For admin viewing only
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) 
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = CustomUserManager()
 
     class Meta:
         db_table = 'users'
         ordering = ['-created_at']
+    
+    def save(self, *args, **kwargs):
+        """Override save to set role based on superuser status"""
+        if self.is_superuser or self.is_staff:
+            self.role = 'admin'
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.username} ({self.role})"
