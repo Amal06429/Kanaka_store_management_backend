@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-237tx3co=3jy30dw@0m-y&cmp*4b6k1&t8r1wkp0lnh$mv&l)m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['www.kanaka.imcbs.com','kanaka.imcbs.com']
 
 import os
 from dotenv import load_dotenv
@@ -170,6 +170,8 @@ SIMPLE_JWT = {
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [
+    'https://kanaka.imcbs.com',
+    'http://kanaka.imcbs.com',
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
