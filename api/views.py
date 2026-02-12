@@ -163,24 +163,59 @@ class UploadedFileViewSet(viewsets.ModelViewSet):
             return FileUploadSerializer
         return UploadedFileSerializer
     
-    # 🔥 UPDATED UPLOAD DEBUG FUNCTION
+    def create(self, request, *args, **kwargs):
+        """Override create to ensure JSON error responses"""
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            print("==== CREATE METHOD ERROR ====")
+            print("Error:", str(e))
+            print("Error type:", type(e).__name__)
+            import traceback
+            traceback.print_exc()
+            print("==== CREATE METHOD ERROR END ====")
+            
+            # Return JSON error instead of letting Django return HTML
+            return Response(
+                {
+                    'detail': f'Upload failed: {str(e)}',
+                    'error_type': type(e).__name__
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    # 🔥 UPDATED UPLOAD DEBUG FUNCTION WITH ERROR HANDLING
     def perform_create(self, serializer):
         print("==== FILE UPLOAD DEBUG START ====")
 
-        file_obj = serializer.save(user=self.request.user)
-
-        print("User:", self.request.user.username)
-        print("Storage class:", type(file_obj.file.storage))
-        print("File name:", file_obj.file.name)
-        print("File URL:", file_obj.file.url)
-
         try:
-            exists = file_obj.file.storage.exists(file_obj.file.name)
-            print("Exists in storage:", exists)
-        except Exception as e:
-            print("Storage check error:", str(e))
+            file_obj = serializer.save(user=self.request.user)
 
-        print("==== FILE UPLOAD DEBUG END ====")
+            print("User:", self.request.user.username)
+            print("Storage class:", type(file_obj.file.storage))
+            print("File name:", file_obj.file.name)
+            
+            try:
+                print("File URL:", file_obj.file.url)
+            except Exception as url_error:
+                print("File URL error:", str(url_error))
+
+            try:
+                exists = file_obj.file.storage.exists(file_obj.file.name)
+                print("Exists in storage:", exists)
+            except Exception as e:
+                print("Storage check error:", str(e))
+
+            print("==== FILE UPLOAD DEBUG END ====")
+            
+        except Exception as e:
+            print("==== FILE UPLOAD ERROR ====")
+            print("Error:", str(e))
+            print("Error type:", type(e).__name__)
+            import traceback
+            traceback.print_exc()
+            print("==== FILE UPLOAD ERROR END ====")
+            raise  # Re-raise to be handled by DRF
 
     # 🔥 DELETE FROM R2 + DB
     def destroy(self, request, *args, **kwargs):
