@@ -1,0 +1,78 @@
+# ===============================
+# Python
+# ===============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.dll
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# ===============================
+# Environment Variables
+# ===============================
+.env
+.env.*
+*.env
+
+# ===============================
+# Django
+# ===============================
+*.log
+db.sqlite3
+media/
+staticfiles/
+*.pot
+*.mo
+
+# Django migrations (optional – keep if team project)
+# */migrations/
+# !*/migrations/__init__.py
+
+# ===============================
+# IDE / Editor
+# ===============================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# ===============================
+# OS Files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Coverage / Testing
+# ===============================
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# ===============================
+# Build / Dist
+# ===============================
+build/
+dist/
+*.egg-info/
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
+# ===============================
+# Node (if accidentally inside backend)
+# ===============================
+node_modules/

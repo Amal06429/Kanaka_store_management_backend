@@ -109,11 +109,10 @@ class UploadedFileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'user', 'created_at']
     
+    
     def get_file_url(self, obj):
-        """Get absolute URL for the file"""
-        request = self.context.get('request')
-        if obj.file and request:
-            return request.build_absolute_uri(obj.file.url)
+        if obj.file:
+            return obj.file.url
         return None
 
 

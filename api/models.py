@@ -62,7 +62,7 @@ class UploadedFile(models.Model):
 
     def __str__(self):
         return f"{self.heading} - {self.name} (by {self.user.username})"
-    
+
     def get_file_size_display(self):
         """Return human-readable file size"""
         size = self.file_size
@@ -71,3 +71,12 @@ class UploadedFile(models.Model):
                 return f"{size:.2f} {unit}"
             size /= 1024.0
         return f"{size:.2f} TB"
+
+    # 🔥 THIS PART DELETES FILE FROM R2 WHEN MODEL IS DELETED
+    def delete(self, *args, **kwargs):
+        if self.file:
+            storage = self.file.storage
+            if storage.exists(self.file.name):
+                storage.delete(self.file.name)
+        super().delete(*args, **kwargs)
+

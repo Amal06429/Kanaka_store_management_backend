@@ -127,7 +127,6 @@ class UploadedFileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def list(self, request, *args, **kwargs):
-        """Override list to add debug logging"""
         print(f"Files list requested by: {request.user.username} (role: {request.user.role})")
         queryset = self.get_queryset()
         print(f"Total files in queryset: {queryset.count()}")
@@ -136,55 +135,90 @@ class UploadedFileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def get_queryset(self):
-        """Filter queryset based on user role and query params"""
         user = self.request.user
         queryset = UploadedFile.objects.all()
         
-        # Filter by user role
         if user.role != 'admin':
             queryset = queryset.filter(user=user)
         
-        # Filter by user_id query param (admin only)
         user_id = self.request.query_params.get('user_id', None)
         if user_id and user.role == 'admin':
             queryset = queryset.filter(user_id=user_id)
         
-        # Filter by date
         date = self.request.query_params.get('date', None)
         if date:
             queryset = queryset.filter(uploaded_at__date=date)
         
-        # Search by heading or description
         search = self.request.query_params.get('search', None)
         if search:
             queryset = queryset.filter(
-                Q(heading__icontains=search) | Q(description__icontains=search)
+                Q(heading__icontains=search) |
+                Q(description__icontains=search)
             )
         
         return queryset.order_by('-uploaded_at')
     
     def get_serializer_class(self):
-        """Use different serializer for create action"""
         if self.action == 'create':
             return FileUploadSerializer
         return UploadedFileSerializer
     
+    # 🔥 UPDATED UPLOAD DEBUG FUNCTION
     def perform_create(self, serializer):
-        """Set the user when creating a file"""
-        print(f"Creating file for user: {self.request.user.username}")
+        print("==== FILE UPLOAD DEBUG START ====")
+
         file_obj = serializer.save(user=self.request.user)
-        print(f"File created: {file_obj.id} - {file_obj.name}")
+
+        print("User:", self.request.user.username)
+        print("Storage class:", type(file_obj.file.storage))
+        print("File name:", file_obj.file.name)
+        print("File URL:", file_obj.file.url)
+
+        try:
+            exists = file_obj.file.storage.exists(file_obj.file.name)
+            print("Exists in storage:", exists)
+        except Exception as e:
+            print("Storage check error:", str(e))
+
+        print("==== FILE UPLOAD DEBUG END ====")
+
+    # 🔥 DELETE FROM R2 + DB
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        print("==== DELETE DEBUG START ====")
+        print("Deleting file:", instance.file.name)
+
+        if instance.file:
+            storage = instance.file.storage
+            file_name = instance.file.name
+
+            try:
+                if storage.exists(file_name):
+                    storage.delete(file_name)
+                    print("File removed from R2:", file_name)
+                else:
+                    print("File not found in R2:", file_name)
+            except Exception as e:
+                print("Delete error:", str(e))
+
+        instance.delete()
+
+        print("==== DELETE DEBUG END ====")
+
+        return Response(
+            {"detail": "File deleted successfully"},
+            status=status.HTTP_200_OK
+        )
     
     @action(detail=False, methods=['get'])
     def my_files(self, request):
-        """Get files uploaded by current user"""
         files = UploadedFile.objects.filter(user=request.user)
         serializer = self.get_serializer(files, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=['get'])
     def stats(self, request):
-        """Get file upload statistics"""
         user = request.user
         
         if user.role == 'admin':
@@ -201,7 +235,6 @@ class UploadedFileViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['patch'], permission_classes=[IsAdminUser])
     def update_status(self, request, pk=None):
-        """Update the status of a file (admin only)"""
         file_obj = self.get_object()
         new_status = request.data.get('status')
         
@@ -216,4 +249,6 @@ class UploadedFileViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(file_obj)
         return Response(serializer.data)
+
+
 

@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Application definition
 
@@ -121,8 +125,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "https://pub-cc8a9cb35a1c4e9d9cfe3e3932f9e4da.r2.dev/"
+
 
 DATABASES = {
     'default': {
@@ -198,3 +202,35 @@ CORS_ALLOW_HEADERS = [
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ===============================
+# Cloudflare R2 Configuration (Django 6 Correct)
+# ===============================
+
+if os.getenv("CLOUDFLARE_R2_ENABLED", "False") == "True":
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": {
+                "access_key": os.getenv("CLOUDFLARE_R2_ACCESS_KEY"),
+                "secret_key": os.getenv("CLOUDFLARE_R2_SECRET_KEY"),
+                "bucket_name": os.getenv("CLOUDFLARE_R2_BUCKET"),
+                "endpoint_url": f"https://{os.getenv('CLOUDFLARE_R2_ACCOUNT_ID')}.r2.cloudflarestorage.com",
+                "region_name": "auto",
+                "signature_version": "s3v4",
+                "addressing_style": "virtual",
+                "default_acl": None,
+                "querystring_auth": False,
+                "file_overwrite": False,
+
+                # 🔥 ADD THIS
+                "custom_domain": "pub-cc8a9cb35a1c4e9d9cfe3e3932f9e4da.r2.dev",
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
