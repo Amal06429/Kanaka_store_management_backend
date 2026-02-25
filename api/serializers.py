@@ -122,7 +122,8 @@ class FileUploadSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UploadedFile
-        fields = ['file', 'heading', 'description', 'document_type', 'amount', 'status', 'uploaded_at']
+        fields = ['file', 'heading', 'description', 'document_type', 'amount', 'status']
+        # uploaded_at is automatically set to current time by the model
     
     def create(self, validated_data):
         """Create uploaded file with user from context"""
